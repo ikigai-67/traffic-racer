@@ -33,7 +33,7 @@ class TrafficRacer:
             self._update_screen()
 
             #Set the default framerate.
-            self.clock.tick(30)
+            self.clock.tick(60)
 
     def _check_events(self):
         """Watch and respond for keyboard and mouse."""
