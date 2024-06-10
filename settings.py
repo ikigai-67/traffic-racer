@@ -7,3 +7,6 @@ class Settings:
         self.screen_width = 400
         self.screen_height = 550
         self.bg_color = (70, 70, 70)
+
+        #Main_car settings
+        self.main_car_speed = 2
