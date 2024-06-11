@@ -4,11 +4,12 @@ import pygame
 
 from settings import Settings
 from main_car import MainCar
+from incoming_vehicles import IncomingVehicle
 
 class TrafficRacer:
     """Overall class to manage game assets and behavior."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         """Initialize the game, and create game resources."""
         pygame.init()
         self.settings = Settings()
@@ -22,6 +23,9 @@ class TrafficRacer:
         pygame.display.set_caption("Traffic Racer")
 
         self.main_car = MainCar(self)
+        self.incoming_vehicles = pygame.sprite.Group()
+
+        self._create_incoming_vehicles()
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -29,6 +33,11 @@ class TrafficRacer:
             self._check_events()
 
             self.main_car.update()
+            self.incoming_vehicles.update()
+            for vehicle in self.incoming_vehicles.copy():
+                if vehicle.rect.top > vehicle.main_window_rect.bottom:
+                    self.incoming_vehicles.remove(vehicle)
+                    self._create_incoming_vehicles()
             
             self._update_screen()
 
@@ -75,14 +84,21 @@ class TrafficRacer:
         if event.key == pygame.K_UP:
             self.main_car.moving_up = False
 
+    def _create_incoming_vehicles(self):
+        """Create the incoming vehicles."""
+        incoming_vehicle = IncomingVehicle(self)
+        self.incoming_vehicles.add(incoming_vehicle)
+
     def _update_screen(self):
         """Update the screen surfaces and flip to the new screen."""
         #Redraw the screen during each pass through the loop.
         self.main_window.fill(self.settings.bg_color)
         #Redraw the main_car during each pass through the loop.
         self.main_car.blitme()
+        self.incoming_vehicles.draw(self.main_window)
         #Make the most recently drawn screen visible.
         pygame.display.flip()
+        
 
 
 #Start the game when this main file is selected/run
