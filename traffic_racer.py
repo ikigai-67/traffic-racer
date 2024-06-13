@@ -83,7 +83,7 @@ class TrafficRacer:
     def _create_incoming_vehicle(self, x_position):
         """Create an incoming vehicle and place it in a row"""
         new_incoming_vehicle = IncomingVehicle(self)
-        new_incoming_vehicle.x = x_position
+        new_incoming_vehicle.x = x_position + randint(-15,15)
         new_incoming_vehicle.rect.x = x_position
         self.incoming_vehicles.add(new_incoming_vehicle)
 
@@ -94,7 +94,7 @@ class TrafficRacer:
         incoming_vehicle_width = incoming_vehicle.rect.width
 
         current_x = incoming_vehicle_width
-        
+
         while current_x < (self.settings.screen_width - incoming_vehicle_width):
             self._create_incoming_vehicle(current_x)
             current_x += 1.75 * incoming_vehicle_width

@@ -31,11 +31,11 @@ class IncomingVehicle(Sprite):
         # self.rect.y = self.rect.top #self.rect.bottom = self.rect.top
 
         #Start each new incoming vehicle near the top left of the screen.
-        self.rect.x = -self.main_window_rect.left
+        self.rect.x = self.main_window_rect.left
         self.rect.y = self.main_window_rect.top #self.rect.bottom = self.rect.top
 
         #Store the incoming vehicles exact position as a float.
-        self.y = float(self.rect.y)
+        self.y = float(self.rect.y + randint(-150,0))
         self.x = float(self.rect.x)
 
     def update(self):
