@@ -26,9 +26,13 @@ class IncomingVehicle(Sprite):
         self.image = pygame.image.load(random_vehicle)
         self.rect = self.image.get_rect()
 
+        # #Start each new incoming vehicle near the top left of the screen.
+        # self.rect.x = self.rect.width * 0.5
+        # self.rect.y = self.rect.top #self.rect.bottom = self.rect.top
+
         #Start each new incoming vehicle near the top left of the screen.
-        self.rect.x = self.rect.width
-        self.rect.y = self.rect.top #self.rect.bottom = self.rect.top
+        self.rect.x = -self.main_window_rect.left
+        self.rect.y = self.main_window_rect.top #self.rect.bottom = self.rect.top
 
         #Store the incoming vehicles exact position as a float.
         self.y = float(self.rect.y)
@@ -40,3 +44,4 @@ class IncomingVehicle(Sprite):
         self.y += self.settings.incoming_vehicle_speed
         #Update the rect position
         self.rect.y = self.y
+        self.rect.x = self.x

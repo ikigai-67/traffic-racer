@@ -2,6 +2,8 @@ import sys
 
 import pygame
 
+from random import randint
+
 from settings import Settings
 from main_car import MainCar
 from incoming_vehicles import IncomingVehicle
@@ -25,20 +27,14 @@ class TrafficRacer:
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
 
-        self._create_incoming_vehicles()
+        self._create_oncoming_traffic()
 
     def run_game(self):
         """Start the main loop for the game."""
         while True:
             self._check_events()
-
             self.main_car.update()
-            self.incoming_vehicles.update()
-            for vehicle in self.incoming_vehicles.copy():
-                if vehicle.rect.top > vehicle.main_window_rect.bottom:
-                    self.incoming_vehicles.remove(vehicle)
-                    self._create_incoming_vehicles()
-            
+            self._update_incoming_vehicles()
             self._update_screen()
 
             #Set the default framerate.
@@ -84,10 +80,33 @@ class TrafficRacer:
         if event.key == pygame.K_UP:
             self.main_car.moving_up = False
 
-    def _create_incoming_vehicles(self):
-        """Create the incoming vehicles."""
+    def _create_incoming_vehicle(self, x_position):
+        """Create an incoming vehicle and place it in a row"""
+        new_incoming_vehicle = IncomingVehicle(self)
+        new_incoming_vehicle.x = x_position
+        new_incoming_vehicle.rect.x = x_position
+        self.incoming_vehicles.add(new_incoming_vehicle)
+
+    def _create_oncoming_traffic(self):
+        """Create an oncoming traffic of vehicles."""
+        #Create a vehicle for the oncoming traffic and keep adding until there's no room left.
         incoming_vehicle = IncomingVehicle(self)
-        self.incoming_vehicles.add(incoming_vehicle)
+        incoming_vehicle_width = incoming_vehicle.rect.width
+
+        current_x = incoming_vehicle_width
+        
+        while current_x < (self.settings.screen_width - incoming_vehicle_width):
+            self._create_incoming_vehicle(current_x)
+            current_x += 1.75 * incoming_vehicle_width
+
+    def _update_incoming_vehicles(self):
+        """Update incoming vehicles and their coordinates."""
+        self.incoming_vehicles.update()
+        for vehicle in self.incoming_vehicles.copy():
+            if vehicle.rect.top > vehicle.main_window_rect.bottom:
+                self.incoming_vehicles.remove(vehicle)
+                if len(self.incoming_vehicles) < 1:
+                    self._create_oncoming_traffic()
 
     def _update_screen(self):
         """Update the screen surfaces and flip to the new screen."""
