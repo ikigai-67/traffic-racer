@@ -11,15 +11,15 @@ class MainCar:
 
         #Load the main car image and get its rect.
         self.image = pygame.image.load('images/SuperB.png')
-        self.image_rect = self.image.get_rect()
+        self.rect = self.image.get_rect()
 
         #Start and Place each new main car at the center of the screen.
         #self.attribute.location = self.attribute.location
-        self.image_rect.center = self.main_window_rect.center #aligns the center of self.image_rect to the center of self.screen_rect
+        self.rect.center = self.main_window_rect.center #aligns the center of self.image_rect to the center of self.screen_rect
 
         #Store a float for the main car's exact horizontal and vertical position.
-        self.x = float(self.image_rect.x)
-        self.y = float(self.image_rect.y)
+        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
 
         #Movement flags, start with a man_car that is not moving.
         self.moving_right = False
@@ -32,19 +32,26 @@ class MainCar:
         Update main car's position based on the movement of flag
           self.moving_right/left
         """
-        if (self.moving_right) and (self.image_rect.right) < self.main_window_rect.right:
-            self.image_rect.x += self.settings.main_car_speed
+        if (self.moving_right) and (self.rect.right) < self.main_window_rect.right:
+            self.rect.x += self.settings.main_car_speed
 
-        if (self.moving_left) and (self.image_rect.left > 0):
-            self.image_rect.x -= self.settings.main_car_speed
+        if (self.moving_left) and (self.rect.left > 0):
+            self.rect.x -= self.settings.main_car_speed
 
-        if (self.moving_down) and (self.image_rect.bottom < self.main_window_rect.bottom) :
-            self.image_rect.y += self.settings.main_car_speed
+        if (self.moving_down) and (self.rect.bottom < self.main_window_rect.bottom) :
+            self.rect.y += self.settings.main_car_speed
 
-        if (self.moving_up) and (self.image_rect.top > 0):
-            self.image_rect.y -= self.settings.main_car_speed
+        if (self.moving_up) and (self.rect.top > 0):
+            self.rect.y -= self.settings.main_car_speed
+
+    def center_main_car(self):
+        """Recenter the main car on the screen."""
+        self.rect.center = self.main_window_rect.center
+        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
+
 
 
     def blitme(self):
         """Draw the main car at its current location."""
-        self.main_window.blit(self.image, self.image_rect)
+        self.main_window.blit(self.image, self.rect)

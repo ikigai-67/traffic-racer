@@ -1,10 +1,12 @@
 import sys
+from time import sleep
 
 import pygame
 
 from random import randint
 
 from settings import Settings
+from game_stats import GameStats
 from main_car import MainCar
 from incoming_vehicles import IncomingVehicle
 
@@ -23,6 +25,10 @@ class TrafficRacer:
             (self.settings.screen_width, self.settings.screen_height)
         )
         pygame.display.set_caption("Traffic Racer")
+        self.game_active = True
+
+        #Create an instance to store game statistics.
+        self.stats = GameStats(self)
 
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
@@ -33,8 +39,11 @@ class TrafficRacer:
         """Start the main loop for the game."""
         while True:
             self._check_events()
-            self.main_car.update()
-            self._update_incoming_vehicles()
+            
+            if self.game_active:
+                self.main_car.update()
+                self._update_incoming_vehicles()
+            
             self._update_screen()
 
             #Set the default framerate.
@@ -107,6 +116,28 @@ class TrafficRacer:
                 self.incoming_vehicles.remove(vehicle)
                 if len(self.incoming_vehicles) < 1:
                     self._create_oncoming_traffic()
+        #Look for car collisions.
+        if pygame.sprite.spritecollideany(self.main_car, self.incoming_vehicles):
+            self._main_car_hit()
+
+    def _main_car_hit(self):
+        """Respond to the main car being hit by incoming vehicle."""
+        if self.stats.main_car_left >= 0:
+            #Decrement main_car_left.
+            self.stats.main_car_left -= 1
+
+            #Get rid of any remaining bullets and aliens.
+            self.incoming_vehicles.empty()
+
+            #Create a new oncoming_traffic and recenter the main car.
+            self._create_oncoming_traffic()
+            self.main_car.center_main_car()
+
+            #Pause
+            sleep(0.5)
+        
+        else:
+            self.game_active = False
 
     def _update_screen(self):
         """Update the screen surfaces and flip to the new screen."""

@@ -10,6 +10,7 @@ class Settings:
 
         #Main_car settings
         self.main_car_speed = 2
+        self.main_car_limit = 3
 
 
         #Incoming vehicles settings
