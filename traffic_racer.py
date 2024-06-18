@@ -26,15 +26,14 @@ class TrafficRacer:
             (self.settings.screen_width, self.settings.screen_height)
         )
         pygame.display.set_caption("Traffic Racer")
-        self.game_active = True
-
+        
         #Create an instance to store game statistics.
         self.stats = GameStats(self)
-
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
 
-        #self._create_oncoming_traffic()
+        #Start game in an active state
+        self.game_active = True
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -44,7 +43,7 @@ class TrafficRacer:
             if self.game_active:
                 self._create_incoming_vehicle()
                 self.main_car.update()
-                self.incoming_vehicles.update()
+                self._update_incoming_vehicles()
             
             self._update_screen()
 
@@ -97,48 +96,35 @@ class TrafficRacer:
             new_incoming_vehicle = IncomingVehicle(self)
             self.incoming_vehicles.add(new_incoming_vehicle)
 
-    # def _create_oncoming_traffic(self):
-    #     """Create an oncoming traffic of vehicles."""
-    #     #Create a vehicle for the oncoming traffic and keep adding until there's no room left.
-    #     incoming_vehicle = IncomingVehicle(self)
-    #     incoming_vehicle_width = incoming_vehicle.rect.width
+    def _update_incoming_vehicles(self):
+        """Update incoming vehicles and their coordinates."""
+        self.incoming_vehicles.update()
+        for vehicle in self.incoming_vehicles.copy():
+            if vehicle.rect.top > vehicle.main_window.get_rect().bottom:
+                self.incoming_vehicles.remove(vehicle)
+        #Look for car collisions.
+        if pygame.sprite.spritecollideany(self.main_car, self.incoming_vehicles):
+            self._main_car_hit()
 
-    #     current_x = incoming_vehicle_width
 
-    #     while current_x < (self.settings.screen_width - incoming_vehicle_width):
-    #         self._create_incoming_vehicle(current_x)
-    #         current_x += 1.75 * incoming_vehicle_width
+    def _main_car_hit(self):
+        """Respond to the main car being hit by incoming vehicle."""
+        if self.stats.main_car_left >= 0:
+            #Decrement main_car_left.
+            self.stats.main_car_left -= 2
 
-    # def _update_incoming_vehicles(self):
-    #     """Update incoming vehicles and their coordinates."""
-    #     self.incoming_vehicles.update()
-    #     for vehicle in self.incoming_vehicles.copy():
-    #         if vehicle.rect.top > vehicle.main_window_rect.bottom:
-    #             self.incoming_vehicles.remove(vehicle)
-    #             if len(self.incoming_vehicles) < 1:
-    #                 self._create_oncoming_traffic()
-    #     #Look for car collisions.
-    #     if pygame.sprite.spritecollideany(self.main_car, self.incoming_vehicles):
-    #         self._main_car_hit()
+            #Get rid of any remaining incoming vehicles.
+            self.incoming_vehicles.empty()
 
-    # def _main_car_hit(self):
-    #     """Respond to the main car being hit by incoming vehicle."""
-    #     if self.stats.main_car_left >= 0:
-    #         #Decrement main_car_left.
-    #         self.stats.main_car_left -= 1
+            #Create a new oncoming_traffic and recenter the main car.
+            self._create_incoming_vehicle()
+            self.main_car.center_main_car()
 
-    #         #Get rid of any remaining bullets and aliens.
-    #         self.incoming_vehicles.empty()
-
-    #         #Create a new oncoming_traffic and recenter the main car.
-    #         #self._create_oncoming_traffic()
-    #         self.main_car.center_main_car()
-
-    #         #Pause
-    #         sleep(0.5)
+            #Pause
+            sleep(0.5)
         
-    #     else:
-    #         self.game_active = False
+        else:
+            self.game_active = False
 
     def _update_screen(self):
         """Update the screen surfaces and flip to the new screen."""
