@@ -1,6 +1,8 @@
+from random import randint
+
 import pygame
 from pygame.sprite import Sprite #must use image and rect for attributes
-from random import randint
+
 
 class IncomingVehicle(Sprite):
     """A class to represent an incoming vehicle."""
@@ -9,7 +11,6 @@ class IncomingVehicle(Sprite):
         super().__init__()
         """Initialize the incoming vehicle and its starting position."""
         self.main_window = tr_game.main_window
-        self.main_window_rect = tr_game.main_window.get_rect()
         self.settings = tr_game.settings
 
         #Load the images of the incoming vehicles and get its rect.
@@ -31,16 +32,15 @@ class IncomingVehicle(Sprite):
         # self.rect.y = self.rect.top #self.rect.bottom = self.rect.top
 
         #Start each new incoming vehicle near the top left of the screen.
-        self.rect.bottom = self.main_window_rect.top
+        self.rect.bottom = self.main_window.get_rect().top
         #self.rect.y = self.main_window_rect.top #self.rect.bottom = self.rect.top
+        incoming_vehicle_right_max = self.settings.screen_width - (self.rect.width//2)
+        self.rect.right = randint(0, incoming_vehicle_right_max)
+        self.rect.left = randint(0, incoming_vehicle_right_max)
 
-        #
-        incoming_vehicle_top_max = self.settings.screen_height - self.rect.height
-        self.rect.top = randint(0, incoming_vehicle_top_max)
 
         #Store the incoming vehicles exact position as a float.
-        self.y = float(self.rect.y + randint(-150,0))
-        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
 
     def update(self):
         """Move incoming vehicles down the screen."""
@@ -48,4 +48,4 @@ class IncomingVehicle(Sprite):
         self.y += self.settings.incoming_vehicle_speed
         #Update the rect position
         self.rect.y = self.y
-        self.rect.x = self.x
+

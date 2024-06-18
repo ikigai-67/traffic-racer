@@ -15,4 +15,4 @@ class Settings:
 
         #Incoming vehicles settings
         self.incoming_vehicle_speed = 2
-        self.incoming_vehicle_frequency = 0.008
+        self.incoming_vehicle_frequency = 0.01
