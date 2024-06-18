@@ -32,7 +32,7 @@ class MainCar:
         Update main car's position based on the movement of flag
           self.moving_right/left
         """
-        if (self.moving_right) and (self.rect.right) < self.main_window_rect.right:
+        if (self.moving_right) and (self.rect.right < self.main_window_rect.right):
             self.rect.x += self.settings.main_car_speed
 
         if (self.moving_left) and (self.rect.left > 0):
@@ -49,8 +49,6 @@ class MainCar:
         self.rect.center = self.main_window_rect.center
         self.x = float(self.rect.x)
         self.y = float(self.rect.y)
-
-
 
     def blitme(self):
         """Draw the main car at its current location."""
