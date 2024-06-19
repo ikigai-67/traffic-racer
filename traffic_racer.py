@@ -8,6 +8,7 @@ from random import randint
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from main_car import MainCar
 from incoming_vehicles import IncomingVehicle
 
@@ -32,8 +33,10 @@ class TrafficRacer:
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
 
-        #Start game in an active state
-        self.game_active = True
+        #Start game in an inactive state
+        self.game_active = False
+        #Make the play button
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -55,6 +58,9 @@ class TrafficRacer:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -63,6 +69,8 @@ class TrafficRacer:
     def _check_keydown_events(self, event):
         """Respond to key presses."""
         #Move the main_car to the right.
+        if event.key == pygame.K_p and not self.game_active:
+            self._start_game()
         if event.key == pygame.K_RIGHT:
             self.main_car.moving_right = True
         #Move main_car to the left.
@@ -89,6 +97,24 @@ class TrafficRacer:
             self.main_car.moving_down = False
         if event.key == pygame.K_UP:
             self.main_car.moving_up = False
+
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks the Play button."""
+        Button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if Button_clicked and not self.game_active:
+            self._start_game()
+
+    def _start_game(self):
+        """Start the game and reset the game's statistics and assets."""
+        self.stats.reset_stats()
+        self.game_active = True
+
+        self.incoming_vehicles.empty()
+        
+        self._create_incoming_vehicle()
+        self.main_car.center_main_car()
+
+        pygame.mouse.set_visible(False)
 
     def _create_incoming_vehicle(self):
         """Create an incoming vehicle if conditions are right."""
@@ -125,6 +151,7 @@ class TrafficRacer:
         
         else:
             self.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _update_screen(self):
         """Update the screen surfaces and flip to the new screen."""
@@ -133,6 +160,10 @@ class TrafficRacer:
         #Redraw the main_car during each pass through the loop.
         self.main_car.blitme()
         self.incoming_vehicles.draw(self.main_window)
+
+        #Draw the play button if the game is inactive.
+        if not self.game_active:
+            self.play_button.draw_button()
         #Make the most recently drawn screen visible.
         pygame.display.flip()
         
