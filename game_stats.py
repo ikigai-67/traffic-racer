@@ -9,3 +9,4 @@ class GameStats:
     def reset_stats(self):
         """Initialize statistics that can change during the game."""
         self.main_car_left = self.settings.main_car_limit
+        self.score = 0

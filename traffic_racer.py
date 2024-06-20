@@ -8,6 +8,7 @@ from random import randint
 
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from main_car import MainCar
 from incoming_vehicles import IncomingVehicle
@@ -30,6 +31,7 @@ class TrafficRacer:
         
         #Create an instance to store game statistics.
         self.stats = GameStats(self)
+        self.scoreboard = Scoreboard(self)
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
 
@@ -70,6 +72,10 @@ class TrafficRacer:
         """Respond to key presses."""
         #Move the main_car to the right.
         if event.key == pygame.K_p and not self.game_active:
+            #Reset dynamic settings.
+            self.settings.initialize_dynamic_settings()
+            self.stats.reset_stats()
+            self.scoreboard.prep_score()
             self._start_game()
         if event.key == pygame.K_RIGHT:
             self.main_car.moving_right = True
@@ -102,6 +108,10 @@ class TrafficRacer:
         """Start a new game when the player clicks the Play button."""
         Button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if Button_clicked and not self.game_active:
+            #Reset dynamic settings.
+            self.settings.initialize_dynamic_settings()
+            self.stats.reset_stats()
+            self.scoreboard.prep_score()
             self._start_game()
 
     def _start_game(self):
@@ -128,9 +138,15 @@ class TrafficRacer:
         for vehicle in self.incoming_vehicles.copy():
             if vehicle.rect.top > vehicle.main_window.get_rect().bottom:
                 self.incoming_vehicles.remove(vehicle)
+                self.stats.score += self.settings.incoming_vehicle_points
+                self.scoreboard.prep_score()
         #Look for car collisions.
         if pygame.sprite.spritecollideany(self.main_car, self.incoming_vehicles):
             self._main_car_hit()
+
+        #Speed up the incoming vehicles if player reaches a certain score.
+        if self.stats.score != 0 and self.stats.score % 100 == 0:
+            self.settings.increase_speed()
 
 
     def _main_car_hit(self):
@@ -151,6 +167,8 @@ class TrafficRacer:
         
         else:
             self.game_active = False
+            #Reset dynamic settings.
+            self.settings.initialize_dynamic_settings()
             pygame.mouse.set_visible(True)
 
     def _update_screen(self):
@@ -160,6 +178,8 @@ class TrafficRacer:
         #Redraw the main_car during each pass through the loop.
         self.main_car.blitme()
         self.incoming_vehicles.draw(self.main_window)
+
+        self.scoreboard.show_score()
 
         #Draw the play button if the game is inactive.
         if not self.game_active:
