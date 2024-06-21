@@ -9,7 +9,6 @@ from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button
 from main_car import MainCar
-from car_lives import CarLife
 from incoming_vehicles import IncomingVehicle
 
 class TrafficRacer:
@@ -33,7 +32,6 @@ class TrafficRacer:
         self.scoreboard = Scoreboard(self)
         self.main_car = MainCar(self)
         self.incoming_vehicles = pygame.sprite.Group()
-        self.car_life = CarLife(self)
 
         #Start game in an inactive state
         self.game_active = False
@@ -78,7 +76,6 @@ class TrafficRacer:
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
             self.scoreboard.prep_level()
-            self.scoreboard.prep_car_lives()
             self._start_game()
 
     def _check_keydown_events(self, event):
@@ -91,7 +88,6 @@ class TrafficRacer:
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
             self.scoreboard.prep_level()
-            self.scoreboard.prep_car_lives()
             self._start_game()
         if event.key == pygame.K_RIGHT:
             self.main_car.moving_right = True
@@ -161,23 +157,18 @@ class TrafficRacer:
          a score divisible by 100.
         """
         #Speed up the incoming vehicles if player reaches a certain score.
-        if self.stats.score % 100 == 11:
-            self.stats.score = round(self.stats.score, -1)
         if self.stats.score != 0 and self.stats.score % 100 == 0:
             self.stats.score += 1
             self.settings.increase_speed()
             #Increase the level by 1.
-            self.stats.level += 1
+            self.stats.level = int(self.stats.level) + 1
             self.scoreboard.prep_level()
-
-
 
     def _main_car_hit(self):
         """Respond to the main car being hit by incoming vehicle."""
-        if self.stats.main_car_left > 0:
+        if self.stats.main_car_left >= 0:
             #Decrement main_car_left.
-            self.stats.main_car_left -= 1
-            self.scoreboard.prep_car_lives()
+            self.stats.main_car_left -= 2
 
             #Get rid of any remaining incoming vehicles.
             self.incoming_vehicles.empty()
