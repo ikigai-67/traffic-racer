@@ -26,7 +26,7 @@ class TrafficRacer:
         self.main_window = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
-        pygame.display.set_caption("Traffic Racer")
+        pygame.display.set_caption("Traffic Racer v2")
         
         #Create an instance to store game statistics.
         self.stats = GameStats(self)
